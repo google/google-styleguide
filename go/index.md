@@ -156,9 +156,7 @@ reviews.
 *   [Go Data Structures](https://research.swtch.com/godata)
 *   [Go Interfaces](https://research.swtch.com/interfaces)
 *   [Go Proverbs](https://go-proverbs.github.io/)
-
 *   <a id="gotip"></a> Go Tip Episodes - stay tuned.
-
 *   <a id="unit-testing-practices"></a> Unit Testing Practices - stay tuned.
 
 **Relevant Testing-on-the-Toilet articles**
