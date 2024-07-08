@@ -31,9 +31,12 @@ that apply to that project.
 *   [TypeScript Style Guide][ts]
 *   [Vim script Style Guide][vim]
 
-This project also contains [cpplint][cpplint], a tool to assist with style guide
-compliance, and [google-c-style.el][emacs], an Emacs settings file for Google
-style.
+This project also contains [google-c-style.el][emacs], an Emacs settings file
+for Google style.
+
+We used to host the cpplint tool, but we stopped making internal updates public.
+An open source community has forked the project, so users are encouraged to use
+https://github.com/cpplint/cpplint instead.
 
 If your project requires that you create a new XML document format, the
 [XML Document Format Style Guide][xml] may be helpful. In addition to actual
@@ -85,7 +88,6 @@ primarily optimizing for Google's internal needs.
 [angular]: https://google.github.io/styleguide/angularjs-google-style.html
 [cl]: https://google.github.io/styleguide/lispguide.xml
 [vim]: https://google.github.io/styleguide/vimscriptguide.xml
-[cpplint]: https://github.com/google/styleguide/tree/gh-pages/cpplint
 [emacs]: https://raw.githubusercontent.com/google/styleguide/gh-pages/google-c-style.el
 [xml]: https://google.github.io/styleguide/xmlstyle.html
 [dart]: https://www.dartlang.org/guides/language/effective-dart
