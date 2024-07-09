@@ -337,7 +337,7 @@ int SomeProperty => _someProperty
 *   In general, prefer a named class type over `Tuple<>`, particularly when
     returning complex types.
 
-### `String interpolation` vs `String.Format()` vs `String.Concat` vs `operator+`
+### String interpolation vs `String.Format()` vs `String.Concat` vs `operator+`
 
 *   In general, use whatever is easiest to read, particularly for logging and
     assert messages.
