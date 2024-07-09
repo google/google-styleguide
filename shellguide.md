@@ -6,6 +6,7 @@ See README.md for details.
 
 # Shell Style Guide
 
+
 <!-- The revision number is maintained manually.
      The major number is:
        1 = shell.xml
@@ -24,11 +25,11 @@ Section                                                                         
 [Shell Files and Interpreter Invocation](#s2-shell-files-and-interpreter-invocation) | [File Extensions](#s2.1-file-extensions) - [SUID/SGID](#s2.2-suid-sgid)
 [Environment](#s3-environment)                                                       | [STDOUT vs STDERR](#s3.1-stdout-vs-stderr)
 [Comments](#s4-comments)                                                             | [File Header](#s4.1-file-header) - [Function Comments](#s4.2-function-comments) - [Implementation Comments](#s4.3-implementation-comments) - [TODO Comments](#s4.4-todo-comments)
-[Formatting](#s5-formatting)                                                         | [Indentation](#s5.1-indentation) - [Line Length and Long Strings](#s5.2-line-length-and-long-strings) - [Pipelines](#s5.3-pipelines) - [Loops](#s5.4-loops) - [Case statement](#s5.5-case-statement) - [Variable expansion](#s5.6-variable-expansion) - [Quoting](#s5.7-quoting)
-[Features and Bugs](#s6-features-and-bugs)                                           |    [ShellCheck](#s6.1-shellcheck) - [Command Substitution](#s6.2-command-substitution) - [Test, `[… ]`, and `[[… ]]`](#s6.3-tests) - [Testing Strings](#s6.4-testing-strings) - [Wildcard Expansion of Filenames](#s6.5-wildcard-expansion-of-filenames) - [Eval](#s6.6-eval) - [Arrays](#s6.7-arrays) - [Pipes to While](#s6.8-pipes-to-while) - [Arithmetic](#s6.9-arithmetic)
-[Naming Conventions](#s7-naming-conventions)                                         | [Function Names](#s7.1-function-names) - [Variable Names](#s7.2-variable-names) - [Constants and Environment Variable Names](#s7.3-constants-and-environment-variable-names) - [Source Filenames](#s7.4-source-filenames) - [Read-only Variables](#s7.5-read-only-variables) - [Use Local Variables](#s7.6-use-local-variables) - [Function Location](#s7.7-function-location) - [main](#s7.8-main)
+[Formatting](#s5-formatting)                                                         | [Indentation](#s5.1-indentation) - [Line Length and Long Strings](#s5.2-line-length-and-long-strings) - [Pipelines](#s5.3-pipelines) - [Control Flow](#s5.4-control-flow) - [Case statement](#s5.5-case-statement) - [Variable expansion](#s5.6-variable-expansion) - [Quoting](#s5.7-quoting)
+[Features and Bugs](#s6-features-and-bugs)                                           |    [ShellCheck](#s6.1-shellcheck) - [Command Substitution](#s6.2-command-substitution) - [Test, `[… ]`, and `[[… ]]`](#s6.3-tests) - [Testing Strings](#s6.4-testing-strings) - [Wildcard Expansion of Filenames](#s6.5-wildcard-expansion-of-filenames) - [Eval](#s6.6-eval) - [Arrays](#s6.7-arrays) - [Pipes to While](#s6.8-pipes-to-while) - [Arithmetic](#s6.9-arithmetic) - [Aliases](#s6.10-aliases)
+[Naming Conventions](#s7-naming-conventions)                                         | [Function Names](#s7.1-function-names) - [Variable Names](#s7.2-variable-names) - [Constants and Environment Variable Names](#s7.3-constants-and-environment-variable-names) - [Source Filenames](#s7.4-source-filenames) - [Use Local Variables](#s7.5-use-local-variables) - [Function Location](#s7.6-function-location) - [main](#s7.7-main)
 [Calling Commands](#s8-calling-commands)                                             | [Checking Return Values](#s8.1-checking-return-values) - [Builtin Commands vs. External Commands](#s8.2-builtin-commands-vs-external-commands)
-[Conclusion](#s9-conclusion)                                                         |
+[When in Doubt: Be Consistent](#s9-conclusion)                                       |
 
 <a id="s1-background"></a>
 
@@ -39,20 +40,20 @@ Section                                                                         
 
 ### Which Shell to Use
 
-Bash is the only shell scripting language permitted for
-executables.
+Bash is the only shell scripting language permitted for executables.
 
-Executables must start with `#!/bin/bash` and a minimum
-number of flags. Use `set` to set shell options so that
-calling your script as `bash script_name`
-does not break its functionality.
+Executables must start with `#!/bin/bash` and minimal flags. Use `set` to set
+shell options so that calling your script as `bash script_name` does not break
+its functionality.
 
-Restricting all executable shell scripts to *bash* gives us a
-consistent shell language that's installed on all our machines.
+Restricting all executable shell scripts to *bash* gives us a consistent shell
+language that's installed on all our machines. In particular, this means there
+is generally no need to strive for POSIX-compatibility or otherwise avoid
+"bashisms".
 
-The only exception to this is where you're forced to by whatever
-you're coding for. One example of this is Solaris SVR4 packages
-which require plain Bourne shell for any scripts.
+The only exception to the above is where you're forced to by whatever you're
+coding for. For example some legacy operating systems or constrained execution
+environments may require plain Bourne shell for certain scripts.
 
 <a id="s1.2-when-to-use-shell"></a>
 
@@ -79,6 +80,7 @@ Some guidelines:
 *   When assessing the complexity of your code (e.g. to decide whether
     to switch languages) consider whether the code is easily
     maintainable by people other than its author.
+
 
 <a id="s2-shell-files-and-interpreter-invocation"></a>
 
@@ -168,15 +170,15 @@ Example:
 
 ### Function Comments
 
-Any function that is not both obvious and short must be commented. Any
-function in a library must be commented regardless of length or
-complexity.
+Any function that is not both obvious and short must have a function header
+comment. Any function in a library must have a function header comment
+regardless of length or complexity.
 
 It should be possible for someone else to learn how to use your
 program or to use a function in your library by reading the comments
 (and self-help, if provided) without reading the code.
 
-All function comments should describe the intended API behaviour using:
+All function header comments should describe the intended API behaviour using:
 
 *   Description of the function.
 *   Globals: List of global variables used and modified.
@@ -245,16 +247,13 @@ good-enough but not perfect.
 
 This matches the convention in the [C++ Guide](https://google.github.io/styleguide/cppguide.html#TODO_Comments).
 
-`TODO`s should include the string `TODO` in all
-caps, followed by the name, e-mail address, or other identifier of the person
-with the best context about the problem referenced by
-the `TODO`. The main purpose is to have a consistent
-`TODO` that can be searched to find out how to get more
-details upon request. A `TODO` is not a commitment that the
-person referenced will fix the problem. Thus when you create a
-`TODO` , it is
-almost always your
-name that is given.
+
+`TODO`s should include the string `TODO` in all caps, followed by the name,
+e-mail address, or other identifier of the person with the best context about
+the problem referenced by the `TODO`. The main purpose is to have a consistent
+`TODO` that can be searched to find out how to get more details upon request. A
+`TODO` is not a commitment that the person referenced will fix the problem. Thus
+when you create a `TODO`, it is almost always your name that is given.
 
 Examples:
 
@@ -279,17 +278,25 @@ Use blank lines between blocks to improve readability. Indentation is
 two spaces. Whatever you do, don't use tabs. For existing files, stay
 faithful to the existing indentation.
 
+**Exception:** The only exception for using tabs is for the body of `<<-`
+tab-indented
+[here-document](https://www.gnu.org/software/bash/manual/html_node/Redirections.html#Here-Documents).
+
 <a id="s5.2-line-length-and-long-strings"></a>
 
 ### Line Length and Long Strings
 
 Maximum line length is 80 characters.
 
-If you have to write strings that are longer than 80 characters, this
-should be done with a here document or an embedded newline if
-possible. Literal strings that have to be longer than 80 chars and
-can't sensibly be split are ok, but it's strongly preferred to find a
-way to make it shorter.
+If you have to write literal strings that are longer than 80 characters, this
+should be done with a
+[here document](https://www.gnu.org/software/bash/manual/html_node/Redirections.html#Here-Documents)
+or an embedded newline if possible.
+
+Words that are longer than 80 chars and can't sensibly be split are ok, but
+where possible these items should be on a line of their own, or factored into a
+variable. Examples include file paths and URLs, particularly where
+string-matching them (such as `grep`) is valuable for maintenance.
 
 ```shell
 # DO use 'here document's
@@ -301,21 +308,37 @@ END
 # Embedded newlines are ok too
 long_string="I am an exceptionally
 long string."
+
+long_file="/i/am/an/exceptionally/loooooooooooooooooooooooooooooooooooooooooooooooooooong_file"
+
+long_string_with_long_file="i am including an exceptionally \
+/very/long/file\
+ in this long string."
+
+# Long file converted into a shorter variable name with cleaner line breaking.
+long_string_alt="i am an including an exceptionally ${long_file} in this long\
+ string"
+```
+
+```shell
+# Just because a line contains an exception doesn't mean the rest of the
+# line shouldn't be wrapped like usual.
+
+bad_long_string_with_long_file="i am including an exceptionally /very/long/file in this long string."
 ```
 
 <a id="s5.3-pipelines"></a>
 
 ### Pipelines
 
-Pipelines should be split one per line if they don't all fit on one
-line.
+Pipelines should be split one per line if they don't all fit on one line.
 
 If a pipeline all fits on one line, it should be on one line.
 
-If not, it should be split at one pipe segment per line with the pipe
-on the newline and a 2 space indent for the next section of the pipe.
-This applies to a chain of commands combined using `|` as well as to
-logical compounds using `||` and `&&`.
+If not, it should be split at one pipe segment per line with the pipe on the
+newline and a 2 space indent for the next section of the pipe. `\ ` should be
+consistently used to indicate line continuation. This applies to a chain of
+commands combined using `|` as well as to logical compounds using `||` and `&&`.
 
 ```shell
 # All fits on one line
@@ -328,39 +351,53 @@ command1 \
   | command4
 ```
 
+This helps readability when distinguishing a pipeline from a regular long
+command continuation, particularly if the line is using both.
+
+Comments will need to precede the whole pipeline. If the comment and pipeline
+are large and complex, then it is worth considering moving low level details of
+them aside by using a helper function.
+
+<a id="s5.4-control-flow"></a>
+
+<!-- section was previously titled "Loops" -->
+
 <a id="s5.4-loops"></a>
+<a id="loops"></a>
 
-### Loops
+### Control Flow
 
-Put `; do` and `; then` on the same line as the
-`while`, `for` or `if`.
+Put `; then` and `; do` on the same line as the `if`, `for`, or `while`.
 
-Loops in shell are a bit different, but we follow the same principles
-as with braces when declaring functions. That is: `; then`
-and `; do` should be on the same line as the if/for/while.
-`else` should be on its own line and closing statements
-should be on their own line vertically aligned with the opening
-statement.
+Control flow statements in shell are a bit different, but we follow the same
+principles as with braces when declaring functions. That is: `; then` and `; do`
+should be on the same line as the `if`/`for`/`while`/`until`/`select`. `else`
+should be on its own line and closing statements (`fi` and `done`) should be on
+their own line vertically aligned with the opening statement.
 
 Example:
 
 ```shell
-# If inside a function, consider declaring the loop variable as
+# If inside a function remember to declare the loop variable as
 # a local to avoid it leaking into the global environment:
-# local dir
+local dir
 for dir in "${dirs_to_cleanup[@]}"; do
-  if [[ -d "${dir}/${ORACLE_SID}" ]]; then
-    log_date "Cleaning up old files in ${dir}/${ORACLE_SID}"
-    rm "${dir}/${ORACLE_SID}/"*
-    if (( $? != 0 )); then
-      error_message
-    fi
+  if [[ -d "${dir}/${SESSION_ID}" ]]; then
+    log_date "Cleaning up old files in ${dir}/${SESSION_ID}"
+    rm "${dir}/${SESSION_ID}/"* || error_message
   else
-    mkdir -p "${dir}/${ORACLE_SID}"
-    if (( $? != 0 )); then
-      error_message
-    fi
+    mkdir -p "${dir}/${SESSION_ID}" || error_message
   fi
+done
+```
+
+Although it is possible to
+[omit `in "$@"`](https://www.gnu.org/software/bash/manual/html_node/Looping-Constructs.html#index-for)
+in for loops we recommend consistently including it for clarity.
+
+```shell
+for arg in "$@"; do
+  echo "argument: ${arg}"
 done
 ```
 
@@ -487,12 +524,12 @@ be used *as well*.
     a shell-internal integer (see next point).
 *   Use arrays for safe quoting of lists of elements, especially command-line
     flags. See [Arrays](#arrays) below.
-*   Optionally quote shell-internal, readonly special variables that are defined
-    to be integers: `$?`, `$#`, `$$`, `$!` (man bash). Prefer quoting of "named"
-    internal integer variables, e.g. PPID etc for consistency.
+*   Optionally quote shell-internal, readonly
+    [special variables](https://www.gnu.org/software/bash/manual/html_node/Special-Parameters.html)
+    that are defined to be integers: `$?`, `$#`, `$$`, `$!`. Prefer quoting of
+    "named" internal integer variables, e.g. PPID etc for consistency.
 *   Prefer quoting strings that are "words" (as opposed to command options or
     path names).
-*   Never quote *literal* integers.
 *   Be aware of the quoting rules for pattern matches in `[[ … ]]`. See the
     [Test, `[ … ]`, and `[[ … ]]`](#tests) section below.
 *   Use `"$@"` unless you have a specific reason to use `$*`, such as simply
@@ -560,7 +597,10 @@ grep -cP '([Ss]pecial|\|?characters*)$' ${1:+"$1"}
 #   by (usually) spaces,
 #   so no args provided will result in one empty string
 #   being passed on.
-# (Consult `man bash` for the nit-grits ;-)
+#
+# Consult
+# https://www.gnu.org/software/bash/manual/html_node/Special-Parameters.html and
+# https://mywiki.wooledge.org/BashGuide/Arrays for more
 
 (set -- 1 "2 two" "3 three tres"; echo $#; set -- "$*"; echo "$#, $@")
 (set -- 1 "2 two" "3 three tres"; echo $#; set -- "$@"; echo "$#, $@")
@@ -607,10 +647,9 @@ var="`command \`command1\``"
 
 `[[ … ]]` is preferred over `[ … ]`, `test` and `/usr/bin/[`.
 
-`[[ … ]]` reduces errors as no pathname expansion or word
-splitting takes place between `[[` and `]]`. In
-addition, `[[ … ]]` allows for regular expression matching,
-while `[ … ]` does not.
+`[[ … ]]` reduces errors as no pathname expansion or word splitting takes place
+between `[[` and `]]`. In addition, `[[ … ]]` allows for pattern and regular
+expression matching, while `[ … ]` does not.
 
 ```shell
 # This ensures the string on the left is made up of characters in
@@ -628,13 +667,14 @@ fi
 
 ```shell
 # This gives a "too many arguments" error as f* is expanded to the
-# contents of the current directory
+# contents of the current directory. It might also trigger the
+# "unexpected operator" error because `[` does not support `==`, only `=`.
 if [ "filename" == f* ]; then
   echo "Match"
 fi
 ```
 
-For the gory details, see E14 at http://tiswww.case.edu/php/chet/bash/FAQ
+For the gory details, see E14 in the [Bash FAQ](http://tiswww.case.edu/php/chet/bash/FAQ)
 
 <a id="s6.4-testing-strings"></a>
 
@@ -976,8 +1016,8 @@ recommendation only.
 ```shell
 # N.B.: Remember to declare your variables as integers when
 # possible, and to prefer local variables over globals.
-local -i hundred=$(( 10 * 10 ))
-declare -i five=$(( 10 / 2 ))
+local -i hundred="$(( 10 * 10 ))"
+declare -i five="$(( 10 / 2 ))"
 
 # Increment the variable "i" by three.
 # Note that:
@@ -993,7 +1033,41 @@ declare -i five=$(( 10 / 2 ))
 hr=2
 min=5
 sec=30
-echo $(( hr * 3600 + min * 60 + sec )) # prints 7530 as expected
+echo "$(( hr * 3600 + min * 60 + sec ))" # prints 7530 as expected
+```
+
+<a id="s6.10-aliases"></a>
+
+## Aliases
+
+Although commonly seen in `.bashrc` files, aliases should be avoided in scripts.
+As the
+[Bash manual](https://www.gnu.org/software/bash/manual/html_node/Aliases.html)
+notes:
+
+> For almost every purpose, shell functions are preferred over aliases.
+
+Aliases are cumbersome to work with because they require carefully quoting and
+escaping their contents, and mistakes can be hard to notice.
+
+```shell
+# this evaluates $RANDOM once when the alias is defined,
+# so the echo'ed string will be the same on each invocation
+alias random_name="echo some_prefix_${RANDOM}"
+```
+
+Functions provide a superset of alias' functionality and should always be
+preferred. .
+
+```shell
+random_name() {
+  echo "some_prefix_${RANDOM}"
+}
+
+# Note that unlike aliases function's arguments are accessed via $@
+fancy_ls() {
+  ls -lh "$@"
+}
 ```
 
 <a id="s7-naming-conventions"></a>
@@ -1004,16 +1078,17 @@ echo $(( hr * 3600 + min * 60 + sec )) # prints 7530 as expected
 
 ### Function Names
 
-Lower-case, with underscores to separate words. Separate libraries with
-`::`. Parentheses are required after the function name. The
-keyword `function` is optional, but must be used consistently
-throughout a project.
+Lower-case, with underscores to separate words. Separate libraries with `::`.
+Parentheses are required after the function name. The keyword `function` is
+optional, but must be used consistently throughout a project.
 
-If you're writing single functions, use lowercase and separate words
-with underscore. If you're writing a package, separate package names
-with `::`. Braces must be on the same line as the function
-name (as with other languages at Google) and no space between the
-function name and the parenthesis.
+If you're writing single functions, use lowercase and separate words with
+underscore. If you're writing a package, separate package names with `::`.
+However, functions intended for interactive use may choose to avoid colons as it
+can confuse bash auto-completion.
+
+Braces must be on the same line as the function name (as with other languages at
+Google) and no space between the function name and the parenthesis.
 
 ```shell
 # Single function
@@ -1035,7 +1110,7 @@ functions.
 
 ### Variable Names
 
-As for function names.
+Same as for function names.
 
 Variables names for loops should be similarly named for any variable
 you're looping through.
@@ -1047,36 +1122,42 @@ done
 ```
 
 <a id="s7.3-constants-and-environment-variable-names"></a>
+<a id="s7.5-read-only-variables"></a>
 
-### Constants and Environment Variable Names
+### Constants, Environment Variables, and readonly Variables
 
-All caps, separated with underscores, declared at the top of the file.
-
-Constants and anything exported to the environment should be
-capitalized.
+Constants and anything exported to the environment should be capitalized,
+separated with underscores, and declared at the top of the file.
 
 ```shell
 # Constant
 readonly PATH_TO_FILES='/some/path'
 
-# Both constant and environment
+# Both constant and exported to the environment
 declare -xr ORACLE_SID='PROD'
 ```
 
-Some things become constant at their first setting (for example, via
-getopts). Thus, it's OK to set a constant in getopts or based on a
-condition, but it should be made readonly immediately afterwards.
-For the sake of clarity `readonly` or `export` is
-recommended instead of the equivalent `declare` commands.
+For the sake of clarity `readonly` or `export` is recommended vs. the equivalent
+`declare` commands. You can do one after the other, like:
 
 ```shell
-VERBOSE='false'
-while getopts 'v' flag; do
-  case "${flag}" in
-    v) VERBOSE='true' ;;
-  esac
-done
-readonly VERBOSE
+# Constant
+readonly PATH_TO_FILES='/some/path'
+export PATH_TO_FILES
+```
+
+It's OK to set a constant at runtime or in a conditional, but it should be made
+readonly immediately afterwards.
+
+```shell
+ZIP_VERSION="$(dpkg --status zip | sed -n 's/^Version: //p')"
+if [[ -z "${ZIP_VERSION}" ]]; then
+  ZIP_VERSION="$(pacman -Q --info zip | sed -n 's/^Version *: //p')"
+fi
+if [[ -z "${ZIP_VERSION}" ]]; then
+  handle_error_and_quit
+fi
+readonly ZIP_VERSION
 ```
 
 <a id="s7.4-source-filenames"></a>
@@ -1089,37 +1170,17 @@ This is for consistency with other code styles in Google:
 `maketemplate` or `make_template` but not
 `make-template`.
 
-<a id="s7.5-read-only-variables"></a>
-
-### Read-only Variables
-
-Use `readonly` or `declare -r` to ensure they're
-read only.
-
-As globals are widely used in shell, it's important to catch errors
-when working with them. When you declare a variable that is meant to
-be read-only, make this explicit.
-
-```shell
-zip_version="$(dpkg --status zip | grep Version: | cut -d ' ' -f 2)"
-if [[ -z "${zip_version}" ]]; then
-  error_message
-else
-  readonly zip_version
-fi
-```
-
+<a id="s7.5-use-local-variables"></a>
 <a id="s7.6-use-local-variables"></a>
 
 ### Use Local Variables
 
-Declare function-specific variables with `local`. Declaration
-and assignment should be on different lines.
+Declare function-specific variables with `local`.
 
-Ensure that local variables are only seen inside a function and its
-children by using `local` when declaring them. This avoids
-polluting the global name space and inadvertently setting variables
-that may have significance outside the function.
+Ensure that local variables are only seen inside a function and its children by
+using `local` when declaring them. This avoids polluting the global namespace
+and inadvertently setting variables that may have significance outside the
+function.
 
 Declaration and assignment must be separate statements when the
 assignment value is provided by a command substitution; as the
@@ -1150,6 +1211,7 @@ my_func2() {
 }
 ```
 
+<a id="s7.6-function-location"></a>
 <a id="s7.7-function-location"></a>
 
 ### Function Location
@@ -1162,6 +1224,7 @@ If you've got functions, put them all together near the top of the
 file. Only includes, `set` statements and setting constants
 may be done before declaring functions.
 
+<a id="s7.7-main"></a>
 <a id="s7.8-main"></a>
 
 ### main
@@ -1169,11 +1232,10 @@ may be done before declaring functions.
 A function called `main` is required for scripts long enough
 to contain at least one other function.
 
-In order to easily find the start of the program, put the main program
-in a function called `main` as the bottom most function.
-This provides consistency with the rest of the code base as well as
-allowing you to define more variables as `local` (which
-can't be done if the main code is not a function). The last
+In order to easily find the start of the program, put the main program in a
+function called `main` as the bottom-most function. This provides consistency
+with the rest of the code base as well as allowing you to define more variables
+as `local` (which can't be done if the main code is not a function). The last
 non-comment line in the file should be a call to `main`:
 
 ```shell
@@ -1249,32 +1311,44 @@ fi
 Given the choice between invoking a shell builtin and invoking a
 separate process, choose the builtin.
 
-We prefer the use of builtins such as the *Parameter Expansion*
-functions in `bash(1)` as it's more robust and portable
-(especially when compared to things like `sed`).
+We prefer the use of builtins such as the
+[*Parameter Expansion*](https://www.gnu.org/software/bash/manual/html_node/Shell-Parameter-Expansion.html)
+functionality provided by `bash` as it's more efficient, robust, and portable
+(especially when compared to things like `sed`). See also the
+[`=~` operator](https://www.gnu.org/software/bash/manual/html_node/Conditional-Constructs.html#index-_005b_005b).
 
 Examples:
 
 ```shell
 # Prefer this:
-addition=$(( X + Y ))
+addition="$(( X + Y ))"
 substitution="${string/#foo/bar}"
+if [[ "${string}" =~ foo:(\d+) ]]; then
+  extraction="${BASH_REMATCH[1]}"
+fi
 ```
 
 ```shell
 # Instead of this:
 addition="$(expr "${X}" + "${Y}")"
 substitution="$(echo "${string}" | sed -e 's/^foo/bar/')"
+extraction="$(echo "${string}" | sed -e 's/foo:\([0-9]\)/\1/')"
 ```
 
 <a id="s9-conclusion"></a>
 
-## Conclusion
+## When in Doubt: Be Consistent
 
-Use common sense and *BE CONSISTENT*.
+Using one style consistently through our codebase lets us focus on other (more
+important) issues. Consistency also allows for automation. In many cases, rules
+that are attributed to “Be Consistent” boil down to “Just pick one and stop
+worrying about it”; the potential value of allowing flexibility on these points
+is outweighed by the cost of having people argue over them.
 
-Please take a few minutes to read the Parting Words section at the bottom
-of the
-[C++ Guide](https://google.github.io/styleguide/cppguide.html#Parting_Words).
+However, there are limits to consistency. It is a good tie breaker when there is
+no clear technical argument, nor a long-term direction. Consistency should not
+generally be used as a justification to do things in an old style without
+considering the benefits of the new style, or the tendency of the codebase to
+converge on newer styles over time.
 
-Revision 2.02
+Revision 2.03
