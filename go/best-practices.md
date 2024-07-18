@@ -387,12 +387,11 @@ import "path/to/creditcardtest"
 
 func TestProcessor(t *testing.T) {
     var spyCC creditcardtest.Spy
-
     proc := &Processor{CC: spyCC}
 
     // declarations omitted: card and amount
     if err := proc.Process(card, amount); err != nil {
-        t.Errorf("proc.Process(card, amount) = %v, want %v", got, want)
+        t.Errorf("proc.Process(card, amount) = %v, want nil", err)
     }
 
     charges := []creditcardtest.Charge{
@@ -420,7 +419,7 @@ func TestProcessor(t *testing.T) {
 
     // declarations omitted: card and amount
     if err := proc.Process(card, amount); err != nil {
-        t.Errorf("proc.Process(card, amount) = %v, want %v", got, want)
+        t.Errorf("proc.Process(card, amount) = %v, want nil", err)
     }
 
     charges := []creditcardtest.Charge{
@@ -1223,8 +1222,9 @@ func answer(i int) string {
 ```
 
 [Do not call `log` functions before flags have been parsed.](https://pkg.go.dev/github.com/golang/glog#pkg-overview)
-If you must die in an `init` func, a panic is acceptable in place of the logging
-call.
+If you must die in a package initialization function (an `init` or a
+["must" function](decisions#must-functions)), a panic is acceptable in place of
+the fatal logging call.
 
 <a id="documentation"></a>
 
@@ -1723,7 +1723,7 @@ var i = 42
 
 <a id="vardeclzero"></a>
 
-### Non-pointer zero values
+### Declaring variables with zero values
 
 The following declarations use the [zero value]:
 
@@ -1760,6 +1760,15 @@ var coords Point
 if err := json.Unmarshal(data, &coords); err != nil {
 ```
 
+It is also okay to use the zero value in the following form when you need a
+variable of a pointer type:
+
+```go
+// Good:
+msg := new(pb.Bar) // or "&pb.Bar{}"
+if err := proto.Unmarshal(data, msg); err != nil {
+```
+
 If you need a lock or other field that [must not be copied](decisions#copying)
 in your struct, you can make it a value type to take advantage of zero value
 initialization. It does mean that the containing type must now be passed via a
@@ -1792,7 +1801,7 @@ func NewCounter(name string) *Counter {
     return c
 }
 
-var myMsg = new(pb.Bar) // or "&pb.Bar{}".
+var msg = new(pb.Bar) // or "&pb.Bar{}".
 ```
 
 This is because `*pb.Something` satisfies [`proto.Message`] while `pb.Something`
@@ -1806,7 +1815,7 @@ func NewCounter(name string) *Counter {
     return &c
 }
 
-var myMsg = pb.Bar{}
+var msg = pb.Bar{}
 ```
 
 [`proto.Message`]: https://pkg.go.dev/google.golang.org/protobuf/proto#Message

@@ -195,8 +195,8 @@ const (
 
 Words in names that are initialisms or acronyms (e.g., `URL` and `NATO`) should
 have the same case. `URL` should appear as `URL` or `url` (as in `urlPony`, or
-`URLPony`), never as `Url`. This also applies to `ID` when it is short for
-"identifier"; write `appID` instead of `appId`.
+`URLPony`), never as `Url`. As a general rule, identifiers (e.g., `ID` and `DB`)
+should also be capitalized similar to their usage in English prose.
 
 *   In names with multiple initialisms (e.g. `XMLAPI` because it contains `XML`
     and `API`), each letter within a given initialism should have the same case,
@@ -211,7 +211,7 @@ have the same case. `URL` should appear as `URL` or `url` (as in `urlPony`, or
 
 <!-- Keep this table narrow. If it must grow wider, replace with a list. -->
 
-Initialism(s) | Scope      | Correct  | Incorrect
+English Usage | Scope      | Correct  | Incorrect
 ------------- | ---------- | -------- | --------------------------------------
 XML API       | Exported   | `XMLAPI` | `XmlApi`, `XMLApi`, `XmlAPI`, `XMLapi`
 XML API       | Unexported | `xmlAPI` | `xmlapi`, `xmlApi`
@@ -221,6 +221,11 @@ gRPC          | Exported   | `GRPC`   | `Grpc`
 gRPC          | Unexported | `gRPC`   | `grpc`
 DDoS          | Exported   | `DDoS`   | `DDOS`, `Ddos`
 DDoS          | Unexported | `ddos`   | `dDoS`, `dDOS`
+ID            | Exported   | `ID`     | `Id`
+ID            | Unexported | `id`     | `iD`
+DB            | Exported   | `DB`     | `Db`
+DB            | Unexported | `db`     | `dB`
+Txn           | Exported   | `Txn`    | `TXN`
 
 <!--#include file="/go/g3doc/style/includes/special-name-exception.md"-->
 
@@ -1779,7 +1784,7 @@ canvas.RenderCube(cube,
 ```
 
 Note that the lines in the above example are not wrapped at a specific column
-boundary but are grouped based on co-ordinate triples.
+boundary but are grouped based on coordinate triples.
 
 Long string literals within functions should not be broken for the sake of line
 length. For functions that include such strings, a line break can be added after
@@ -2043,6 +2048,8 @@ For errors that indicate "impossible" conditions, namely bugs that should always
 be caught during code review and/or testing, a function may reasonably return an
 error or call [`log.Fatal`].
 
+Also see [when panic is acceptable](best-practices.md#when-to-panic).
+
 **Note:** `log.Fatalf` is not the standard library log. See [#logging].
 
 [Effective Go section on errors]: http://golang.org/doc/effective_go.html#errors
@@ -2176,12 +2183,18 @@ clear. It is conventionally managed with a `context.Context`:
 ```go
 // Good:
 func (w *Worker) Run(ctx context.Context) error {
+    var wg sync.WaitGroup
     // ...
     for item := range w.q {
         // process returns at latest when the context is cancelled.
-        go process(ctx, item)
+        wg.Add(1)
+        go func() {
+            defer wg.Done()
+            process(ctx, item)
+        }()
     }
     // ...
+    wg.Wait()  // Prevent spawned goroutines from outliving this function.
 }
 ```
 
@@ -2222,12 +2235,14 @@ See also:
 *   Rethinking Classical Concurrency Patterns: [slides][rethinking-slides],
     [video][rethinking-video]
 *   [When Go programs end]
+*   [Documentation Conventions: Contexts]
 
 [synchronous functions]: #synchronous-functions
 [cheney-stop]: https://dave.cheney.net/2016/12/22/never-start-a-goroutine-without-knowing-how-it-will-stop
 [rethinking-slides]: https://drive.google.com/file/d/1nPdvhB0PutEJzdCq5ms6UI58dp50fcAN/view
 [rethinking-video]: https://www.youtube.com/watch?v=5zXAHh5tJqQ
 [When Go programs end]: https://changelog.com/gotime/165
+[Documentation Conventions: Contexts]: best-practices.md#documentation-conventions-contexts
 
 <a id="interfaces"></a>
 
@@ -2737,7 +2752,7 @@ formatting to do.
 See also:
 
 *   Best practices on [logging errors](best-practices#error-logging) and
-    [custom verbosily levels](best-practices#vlog)
+    [custom verbosity levels](best-practices#vlog)
 *   When and how to use the log package to
     [stop the program](best-practices#checks-and-panics)
 
