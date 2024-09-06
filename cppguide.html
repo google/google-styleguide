@@ -3026,70 +3026,53 @@ not to mix signedness, and try to avoid unsigned types (except for
 representing bitfields or modular arithmetic). Do not use an unsigned
 type merely to assert that a variable is non-negative.</p>
 
-<h3 id="64-bit_Portability">64-bit Portability</h3>
+<h3 id="Floating-Point_Types">Floating-Point Types</h3>
 
-<p>Code should be 64-bit and 32-bit friendly. Bear in mind
-problems of printing, comparisons, and structure alignment.</p>
+<p>Of the built-in C++ floating-point types, the only ones used
+ are <code>float</code> and
+<code>double</code>. You may assume that these types represent IEEE-754 binary32
+and binary64, respectively.</p>
+
+<p>Do not use <code>long double</code>, as it gives non-portable
+results.</p>
+
+<a id="64-bit_Portability"></a>
+<h3 id="Architecture_Portability">Architecture Portability</h3>
+
+<p>Write architecture-portable code. Do not rely on CPU features specific to a
+single processor.</p>
 
 <ul>
-  <li>
-  <p>Correct portable <code>printf()</code> conversion specifiers for
-  some integral typedefs rely on macro expansions that we find unpleasant to
-  use and impractical to require (the <code>PRI</code> macros from
-  <code>&lt;cinttypes&gt;</code>). Unless there is no reasonable alternative
-  for your particular case, try to avoid or even upgrade APIs that rely on the
-  <code>printf</code> family. Instead use a library supporting typesafe numeric
-  formatting, such as
+  <li>When printing values, use type-safe numeric formatting libraries like
+  <a href="https://github.com/abseil/abseil-cpp/blob/master/absl/strings/str_cat.h"><code>absl::StrCat</code></a>,
+  <a href="https://github.com/abseil/abseil-cpp/blob/master/absl/strings/substitute.h"><code>absl::Substitute</code></a>,
+  <a href="https://github.com/abseil/abseil-cpp/blob/master/absl/strings/str_format.h"><code>absl::StrFormat</code></a>,
+  or <a href="#Streams"><code>std::ostream</code></a> instead of the
+  <code>printf</code> family of functions.</li>
 
-
-    <a href="https://github.com/abseil/abseil-cpp/blob/master/absl/strings/str_cat.h"><code>StrCat</code></a>
-
-    or
-
-
-    <a href="https://github.com/abseil/abseil-cpp/blob/master/absl/strings/substitute.h"><code>Substitute</code></a>
-
-    for fast simple conversions,
-
-    or <a href="#Streams"><code>std::ostream</code></a>.</p>
-
-  <p>Unfortunately, the <code>PRI</code> macros are the only portable way to
-  specify a conversion for the standard bitwidth typedefs (e.g.,
-  <code>int64_t</code>, <code>uint64_t</code>, <code>int32_t</code>,
-  <code>uint32_t</code>, etc).
-  Where possible, avoid passing arguments of types specified by bitwidth
-  typedefs to <code>printf</code>-based APIs. Note that it is acceptable
-  to use typedefs for which printf has dedicated length modifiers, such as
-  <code>size_t</code> (<code>z</code>),
-  <code>ptrdiff_t</code> (<code>t</code>), and
-  <code>maxint_t</code> (<code>j</code>).</p>
+  <li>When moving structured data into or out of your process, encode it using a
+  serialization library like
+  <a href="https://protobuf.dev/">Protocol
+  Buffers</a> rather than copying the in-memory representation around.
   </li>
 
-  <li>Remember that <code>sizeof(void *)</code> !=
-  <code>sizeof(int)</code>. Use <code>intptr_t</code> if
-  you want a pointer-sized integer.</li>
-
-  <li>You may need to be careful with structure
-  alignments, particularly for structures being stored on
-  disk. Any class/structure with a <code>int64_t</code>/<code>uint64_t</code>
-  member will by default end up being 8-byte aligned on a
-  64-bit system. If you have such structures being shared
-  on disk between 32-bit and 64-bit code, you will need
-  to ensure that they are packed the same on both
-  architectures.
-  Most compilers offer a way to
-  alter structure alignment. For gcc, you can use
-  <code>__attribute__((packed))</code>. MSVC offers
-  <code>#pragma pack()</code> and
-  <code>__declspec(align())</code>.</li>
+  <li>If you need to work with memory addresses as integers, store them in
+  <code>uintptr_t</code>s rather than <code>uint32_t</code>s or
+  <code>uint64_t</code>s.</li>
 
   <li>
-  <p>Use <a href="#Casting">braced-initialization</a> as needed to create
-  64-bit constants. For example:</p>
+  Use <a href="#Casting">braced-initialization</a> as needed to create
+  64-bit constants. For example:
 <pre>int64_t my_value{0x123456789};
 uint64_t my_mask{uint64_t{3} &lt;&lt; 48};
 </pre>
   </li>
+
+  <li>Use portable <a href="#Floating-Point_Types">floating point types</a>;
+  avoid <code>long double</code>.</li>
+
+  <li>Use portable <a href="#Integer_Types">integer types</a>; avoid
+  <code>short</code>, <code>long</code>, and <code>long long</code>.</li>
 </ul>
 
 <h3 id="Preprocessor_Macros">Preprocessor Macros</h3>
@@ -3893,6 +3876,37 @@ Requirements that are unenforced at compile time should instead
 be imposed via other mechanisms such as comments, assertions,
 or tests.</p>
 
+<h3 id="modules">C++20 modules</h3>
+
+<p>Do not use C++20 Modules.</p>
+
+<p>C++20 introduces "modules", a new language feature designed as an
+alternative to textual inclusion of header files. It introduces three
+new keywords to support
+this: <code>module</code>, export,
+and <code>import</code>.
+
+</p><p>Modules are a big shift in how C++ is written and compiled, and we
+are still assessing how they may fit into Google's C++ ecosystem in
+the future. Furthermore, they are not currently well-supported by our
+build-systems, compilers, and other tooling, and need further
+exploration as to the best-practices when writing and using them.</p>
+
+
+
+<h3 id="coroutines">Coroutines</h3>
+
+<p>Do not use coroutines (yet).</p>
+
+<p>Do not include the <code>&lt;coroutine&gt;</code> header,
+or use the <code>co_await</code>, <code>co_yield</code>,
+or <code>co_return</code> keywords.</p>
+
+<p>NOTE: this ban is expected to be temporary, while further
+guidance is being developed.
+
+</p>
+
 <h3 id="Boost">Boost</h3>
 
 <p>Use only approved libraries from the Boost library
@@ -3997,11 +4011,11 @@ the future.</p>
 
 
 
-<h3 id="Other_Features"><a id="C++11">Other C++ Features</a></h3>
+<h3 id="Disallowed_Stdlib">Disallowed standard library features</h3>
 
 
 <p>As with <a href="#Boost">Boost</a>, some modern C++
-extensions encourage coding practices that hamper
+library functionality encourages coding practices that hamper
 readability—for example by removing
 checked redundancy (such as type names) that may be
 helpful to readers, or by encouraging template
@@ -4010,8 +4024,7 @@ available through existing mechanisms, which may lead to confusion
 and conversion costs.</p>
 
 <p class="decision"></p>
-<p>In addition to what's described in the rest of the style
-guide, the following C++ features may not be used:</p>
+<p>The following C++ standard library features may not be used:</p>
 
 <ul>
 
@@ -4330,8 +4343,8 @@ local pattern to follow, prefer "<code>_</code>".</p>
   <li><code>myusefulclass_test.cc // _unittest and _regtest are deprecated.</code></li>
 </ul>
 
-<p>C++ files should end in <code>.cc</code> and header files should end in
-<code>.h</code>. Files that rely on being textually included at specific points
+<p>C++ files should have a <code>.cc</code> filename extension, and header files
+should have a <code>.h</code> extension. Files that rely on being textually included at specific points
 should end in <code>.inc</code> (see also the section on
 <a href="#Self_contained_Headers">self-contained headers</a>).</p>
 
@@ -5917,7 +5930,7 @@ which we discuss here.</p>
 
 
 <div>
-<h3 id="Existing_Non-conformant_Code">Existing Non-conformant Code</h3>
+<h3 id="Existing_Non-conformant_Code" class="no-toc">Existing Non-conformant Code</h3>
 
 <p>You may diverge from the rules when dealing with code that
 does not conform to this style guide.</p>
