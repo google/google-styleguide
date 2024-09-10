@@ -2012,7 +2012,7 @@ examples.
 Typical usage example:
 
   foo = ClassFoo()
-  bar = foo.function_bar()
+  bar = foo.method_bar()
 """
 ```
 
