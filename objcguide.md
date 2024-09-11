@@ -1180,7 +1180,7 @@ TimeZoneMappingSet *timeZoneMappings = [TimeZoneMappingSet setWithObjects:...];
 
 Use the most descriptive common superclass or protocol available. In the most
 generic case when nothing else is known, declare the collection to be explicitly
-heterogenous using id.
+heterogeneous using id.
 
 ```objectivec 
 // GOOD:
