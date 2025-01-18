@@ -53,6 +53,12 @@ The following Google style guide lives outside of this project:
 *  [Effective Dart][dart]
 *  [Kotlin Style Guide][kotlin]
 
+Since projects are largely maintained in a [VCS], writing good commit messages
+is important to long term project health. Please refer to [How to Write a Git
+Commit Message](https://cbea.ms/git-commit/) as an excellent resource. While it
+explicitly refers to the Git [SCM], its principles apply to any system, and many
+Git conventions are trivial to translate to others.
+
 ## Contributing
 
 With few exceptions, these style guides are copies of Google's internal style
@@ -92,3 +98,5 @@ primarily optimizing for Google's internal needs.
 [xml]: https://google.github.io/styleguide/xmlstyle.html
 [dart]: https://www.dartlang.org/guides/language/effective-dart
 [ccl]: https://creativecommons.org/licenses/by/3.0/
+[SCM]: https://en.wikipedia.org/wiki/Source_control_management
+[VCS]: https://en.wikipedia.org/wiki/Version_control_system
