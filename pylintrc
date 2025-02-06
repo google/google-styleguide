@@ -274,9 +274,9 @@ max-module-lines=99999
 
 # String used as indentation unit.  The internal Google style guide mandates 4
 # spaces.  Google's externaly-published style guide says 4, consistent with
-# PEP 8.  Here, we use 4 spaces, for conformity with many open-sourced Google
+# PEP 8.  Hence, we use 4 spaces, for conformity with many open-sourced Google
 # projects (like TensorFlow).
-indent-string='  '
+indent-string='    '
 
 # Number of spaces of indent required inside a hanging  or continued line.
 indent-after-paren=4
